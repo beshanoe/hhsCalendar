@@ -1,0 +1,186 @@
+.header-wrap {
+    background-color: #F4F4F4;
+    box-shadow: 0px 0px 5px 1px #BBB;
+}
+
+.centered1k {
+    margin: 0 auto;
+    width: 900px;
+    padding: 0 50px;
+}
+
+/*
+    Header block
+*/
+
+.header-wrap .header {
+    height: 100px;
+    padding: 1px;
+}
+
+.header-wrap .header .toolbar {
+    margin-top: 55px;
+}
+
+.header-wrap .header .toolbar .buttons ul li {
+    float: left;
+    margin-right: 10px;
+}
+
+.header-wrap .header .toolbar .search {
+    float: right;
+}
+
+.header-wrap .header .toolbar .search form {
+    padding-left: 22px;
+    background-image: url("search-icon.png");
+    background-repeat: no-repeat;
+    background-position: 0px 7px;
+}
+
+.header-wrap .header .toolbar .search input[type="text"] {
+    border-radius: 2px;
+    border: 1px solid #CCC;
+    box-shadow: inset 0px 1px 2px 0px #CCC;
+    margin: 0;
+    width: 184px;
+    font-size: 12px;
+    padding: 4px 6px;
+}
+
+.blue-btn {
+    background-color: #0271C7;
+    border-radius: 2px;
+    box-shadow: 0px 1px 2px 0px #BBB;
+    color: #FFFFFF;
+    display: inline-block;
+    font-size: 13px;
+    line-height: 14px;
+    padding: 6px 12px;
+    text-decoration: none;
+    text-shadow: 1px 1px 1px #333;
+}
+
+.blue-btn:ACTIVE {
+    background-color: #015DA4;
+    box-shadow: inset 0px 1px 2px 0px #333;
+    color: #CCC;
+}
+
+/*
+    Content block
+*/
+
+.content > div {
+    margin: 15px 0;
+}
+
+.content .date-picker {
+
+}
+
+.content .date-picker ul:after {
+    content: ".";
+    clear: both;
+    visibility: hidden;
+}
+
+.content .date-picker li{
+    float: left;
+    margin-right: 7px;
+}
+
+.content .date-picker .monthyear {
+    display: block;
+    margin-top: 1px;
+    width: 120px;
+    text-align: center;
+}
+
+.content .date-picker .btn {
+    box-shadow: inset 0px 0px 3px 1px #BBB;
+    border-radius: 2px;
+    display: block;
+    line-height: 12px;
+    font-size: 11px;
+    padding: 2px 6px;
+    text-decoration: none;
+}
+
+.content .date-picker .btn:active {
+    background-color: #BBB;
+    box-shadow: none;
+    color: #FFFFFF;
+}
+
+.content .date-picker .btn.arrow {
+    width: 6px;
+    height: 6px;
+    line-height: 6px;
+    font-size: 6px;
+    padding: 5px;
+}
+
+/*
+    Calendar table element
+*/
+
+table.calendar {
+    font-size: 11px;
+    vertical-align: top;
+    width: 100%;
+}
+
+table.calendar td {
+    position: relative;
+    border: solid 1px #DDD;
+    height: 103px;
+    width: 112px;
+    padding: 8px;
+    cursor: default;
+}
+
+table.calendar td.has-records {
+    background-color: #C2E4FE;
+}
+
+table.calendar td .day {
+    margin-bottom: 6px;
+}
+
+table.calendar td .records {
+    height: 85px;
+    overflow-y: hidden;
+}
+
+table.calendar td .record:hover {
+    background-color: #EEE;
+}
+
+table.calendar td.has-records .record:hover {
+    background-color: #86CAFD;
+}
+
+table.calendar td .record p {
+    margin: 5px 0;
+}
+
+table.calendar td.today {
+    background-color: #F4F4F4;
+}
+
+table.calendar td.today p.day {
+    font-weight: bold;
+}
+
+table.calendar td .record .header {
+    font-weight: bold;
+}
+
+img.mockup {
+    position: absolute;
+    top: 0px;
+    opacity: 0.5;
+    left: 50%;
+    margin-left: -500px;
+}

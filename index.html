@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ru-RU">
+<head>
+    <meta charset="UTF-8">
+    <title>HeadHunter School Calendar</title>
+    <link href='http://fonts.googleapis.com/css?family=PT+Sans&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="reset.css"/>
+    <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+    <!--<img class="mockup" src="mockups/Calendar-HW-01.png" alt=""/>-->
+    <div class="header-wrap">
+        <div class="centered1k header">
+            <div class="toolbar">
+                <div class="buttons">
+                    <ul>
+                        <li>
+                            <a class="blue-btn" id="add-button" href="#">Добавить</a>
+                        </li>
+                        <li>
+                            <a class="blue-btn" id="refresh-btn" href="#">Обновить</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="search">
+                    <form>
+                        <input type="text" placeholder="Событие, дата или участник">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="content-wrap">
+        <div class="centered1k content">
+            <div class="date-picker">
+                <ul>
+                    <li><a class="btn arrow" href="#" data-action="prev">◀</a></li>
+                    <li><span class="monthyear" id="monthYearIndicator">Март 2013</span></li>
+                    <li><a class="btn arrow" href="#" data-action="next">▶</a></li>
+                    <li><a class="btn" href="#" data-action="today">Сегодня</a></li>
+                </ul>
+            </div>
+            <div class="calendar-wrap" id="calendar-block">
+                <table class="calendar">
+                    <tbody>
+                        <tr>
+                            <td class="has-records">
+                                <p class="day">Понедельник, 25</p>
+                                <div class="records">
+                                    <div class="record">
+                                        <p class="header">ДР кого-то</p>
+                                        <p class="members">Вася, Колян</p>
+                                        <p class="description">Узнать бы для начала у кого дырэ</p>
+                                    </div>
+                                    <div class="record">
+                                        <p class="header">В ломбард</p>
+                                        <p class="members"></p>
+                                        <p class="description">Заложить все имусчество</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Вторник, 26</td>
+                            <td>Среда, 27</td>
+                            <td>Четверг, 28</td>
+                            <td>Пятница, 1</td>
+                            <td>Суббота, 2</td>
+                            <td>Воскресенье, 3</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Templates Begin -->
+    <script type="text/template" id="template-record">
+        <div class="record">
+            <p class="header">{{title}}</p>
+            <p class="members">{{members}}</p>
+            <p class="description">{{description}}</p>
+        </div>
+    </script>
+    <script type="text/template" id="template-td">
+        <p class="day">{{day}}</p>
+        <div class="records">{{records}}</div>
+    </script>
+    <!-- Templates End -->
+    <script type="text/javascript" src="script.js"></script>
+</body>
+</html>
