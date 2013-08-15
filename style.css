@@ -38,7 +38,8 @@
     background-position: 0px 7px;
 }
 
-.header-wrap .header .toolbar .search input[type="text"] {
+input[type="text"],
+input[type="textarea"] {
     border-radius: 2px;
     border: 1px solid #CCC;
     box-shadow: inset 0px 1px 2px 0px #CCC;
@@ -59,6 +60,12 @@
     padding: 6px 12px;
     text-decoration: none;
     text-shadow: 1px 1px 1px #333;
+}
+
+.blue-btn.pressed {
+    background-color: #015DA4;
+    box-shadow: inset 0px 1px 2px 0px #333;
+    color: #CCC;
 }
 
 .blue-btn:ACTIVE {
@@ -175,6 +182,143 @@ table.calendar td.today p.day {
 
 table.calendar td .record .header {
     font-weight: bold;
+}
+
+/*
+    Popup
+*/
+
+.popup {
+    position: absolute;
+    display: none;
+    z-index: 100;
+    border-radius: 2px;
+    border: solid 1px #CCC;
+    left: 200px;
+    top: 200px;
+    background-color: #FFF;
+    box-shadow: 0px 2px 7px 0px #CCC;
+}
+
+.popup.show {
+    display: block;
+}
+
+.popup .close-btn {
+    position: absolute;
+    border-radius: 2px;
+    font-size: 10px;
+    padding: 2px 4px;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+}
+
+.popup .close-btn:hover {
+    background-color: #CCC;
+}
+
+/* Styling popup triangles*/
+
+.popup .arrow {
+    position: absolute;
+}
+
+.popup.bottom .arrow {
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
+    border-top: 11px solid;
+    border-top-color: inherit;
+    bottom: -11px;
+    margin-left: -11px;
+    right: 30px;
+}
+.popup.bottom .arrow:after {
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #FFF;
+    content: '';
+    margin-top: -11px;
+    margin-left: -10px;
+    position: absolute;
+}
+
+.popup.top .arrow {
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
+    border-bottom: 11px solid;
+    border-bottom-color: inherit;
+    top: -11px;
+    margin-left: -11px;
+    left: 30px;
+}
+
+.popup.top .arrow:after {
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #FFF;
+    content: '';
+    margin-top: 1px;
+    margin-left: -10px;
+    position: absolute;
+}
+
+/* Defining style for our popups*/
+
+.add-popup {
+    padding: 24px 24px 24px 20px;
+}
+
+.add-popup * {
+    display: block;
+    margin: 0;
+}
+.add-popup input {
+    width: 243px;
+}
+.add-popup button {
+    margin-top: 12px;
+}
+
+.search-popup {
+    padding: 5px;
+}
+
+.search-popup .suggestions {
+    width: 205px;
+    max-height: 400px;
+    overflow-y: scroll;
+}
+
+.search-popup .suggestions .suggestion {
+    padding: 8px;
+}
+
+.search-popup .suggestions .suggestion.selected{
+    background-color: #27A1FF;
+}
+
+.search-popup .suggestions .suggestion.selected p{
+    color: #FFFFFF;
+}
+
+.search-popup .suggestions .suggestion:after {
+    content: '';
+    display: block;
+    position: relative;
+    width: 90%;
+    height: 0;
+    bottom: -5px;
+    border-top: 1px solid #CCC;
+}
+
+.search-popup .suggestions .suggestion p.header {
+    font-size: 12px;
+}
+
+.search-popup .suggestions .suggestion p.date {
+    font-size: 11px;
+    margin-top: 8px;
 }
 
 img.mockup {

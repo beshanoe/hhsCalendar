@@ -92,18 +92,21 @@
     }
 
     /*
-     BEGIN OF HeadHunterCalendar IMPLEMENTATION
-     */
+        BEGIN OF HeadHunterCalendar IMPLEMENTATION
+    */
 
     var HeadHunterCalendar = function(options){
         if (this instanceof HeadHunterCalendar) {
 
-            var currentDate = new Date();
-            this.today = {
-                date: currentDate.getDate(),
-                month: currentDate.getMonth(),
-                year: currentDate.getFullYear()
+            this.refreshToday = function(){
+                var currentDate = new Date();
+                this.today = {
+                    date: currentDate.getDate(),
+                    month: currentDate.getMonth(),
+                    year: currentDate.getFullYear()
+                };
             };
+            this.refreshToday();
 
             options = Utils.extend({
                 month: this.today.month,
@@ -175,7 +178,7 @@
             var tdElement = this.tdElements[d];
 
             date.setDate(date.getDate() + 1);
-            tdElement.hhcDate = new Date(iterateDate.getTime());
+            tdElement.hhcDate = new Date(date.getTime());
 
             var dayInMonth = tdElement.hhcDate.getDate();
             if (d < 7) {
@@ -239,10 +242,123 @@
         return names[this.date.getMonth()] + ' ' + this.date.getFullYear();
     };
 
+    HeadHunterCalendar.prototype.refresh = function(){
+        this.refreshToday();
+        this.render();
+    };
+
     /*
         END OF HeadHunterCalendar IMPLEMENTATION
+    */
+
+    /*
+        POPUP Implementation
      */
 
+    var Popup = function(id, options){
+        if (this instanceof Popup) {
+
+            options = Utils.extend({
+                anywhereClose: true,
+                className: false,
+                closeButton: true
+            }, options);
+
+            if (options.anywhereClose) {
+                Utils.addEvent(window.document.body, 'click', (function(popup){
+                    return function(e){
+                        if (popup.isShown) {
+                            popup.hide();
+                        }
+                    };
+                })(this))
+            }
+
+            this.isShown = false;
+
+            var div = Utils.createDomElement('div');
+            if (options.className) {
+                Utils.addClass(div, options.className);
+            }
+            Utils.addClass(div, 'popup');
+            Utils.addEvent(div, 'click', function(e){
+                e.stopPropagation();
+            })
+
+            if (options.closeButton) {
+                var closeBtn = Utils.createDomElement('div');
+                Utils.addClass(closeBtn, 'close-btn');
+                closeBtn.innerText = 'x';
+                Utils.addEvent(closeBtn, 'click', (function(that){
+                    return function(e){
+                        that.hide();
+                    }
+                })(this));
+                div.appendChild(closeBtn);
+            }
+
+            var arrow = Utils.createDomElement('div');
+            Utils.addClass(arrow, 'arrow');
+            div.appendChild(arrow);
+
+            var el = window.document.getElementById(id);
+            if (el) {
+                div.appendChild(el);
+            }
+            this.div = div;
+
+            window.document.body.appendChild(this.div);
+
+        }
+    }
+
+    Popup.prototype.show = function(options){
+        options = Utils.extend({
+            el: false,
+            arrow: false
+        }, options);
+
+        if (options.arrow) {
+            Utils.removeClass(this.div, 'top', 'right', 'bottom', 'left');
+            Utils.addClass(this.div, options.arrow);
+        }
+        if (options.el) {
+
+            var rect = options.el.getBoundingClientRect();
+            var elPoint = {x: 0, y: 0};
+            switch (options.arrow) {
+                case 'top':
+                    elPoint.x = rect.left;
+                    elPoint.y = rect.top + rect.height + 16;
+                    break;
+            }
+            this.div.style.left = elPoint.x + 'px';
+            this.div.style.top = elPoint.y + 'px';
+
+        }
+
+        this.isShown = true;
+        if (!Utils.hasClass(this.div, 'show')){
+            Utils.addClass(this.div, 'show');
+        }
+        if (this.onshow) {
+            this.onshow();
+        }
+    };
+
+    Popup.prototype.hide = function(){
+        this.isShown = false;
+        Utils.removeClass(this.div, 'show');
+        if (this.onhide) {
+            this.onhide();
+        }
+    };
+
+    /*
+        MAIN
+     */
+
+    //Creating almighty HeadHunterCalendar instance!
     var headHunterCalendar = new HeadHunterCalendar({
         storage: storage,
         monthYearIndicator: document.querySelector('#monthYearIndicator')
@@ -255,6 +371,46 @@
         calendarDiv.appendChild(headHunterCalendar.getTableElement());
     }
 
+
+    //Creating popups
+    var addPopup = new Popup('add-popup');
+
+    //Handing toolbar buttons
+    var addBtn = window.document.getElementById('add-button');
+    addPopup.onshow = function(){
+        Utils.addClass(addBtn, 'pressed');
+    }
+    addPopup.onhide = function(){
+        Utils.removeClass(addBtn, 'pressed');
+    }
+    Utils.addEvent(addBtn, 'click', function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        addPopup.show({
+            el: e.target,
+            arrow: 'top'
+        });
+    });
+    var refreshBtn = window.document.getElementById('refresh-button');
+    Utils.addEvent(refreshBtn, 'click', function(e){
+        e.preventDefault();
+        headHunterCalendar.refresh();
+    });
+
+    var searchPopup = new Popup('search-popup', {
+        closeButton: false
+    });
+    var searchInput = window.document.getElementById('search-input');
+    Utils.addEvent(searchInput, 'click', function(e){
+        e.stopPropagation();
+        searchPopup.show({
+            el: e.target,
+            arrow: 'top'
+        });
+    });
+
+
+    //Date picker buttons clicks handler
     var datePickerBtnHandler = function(e){
         e.preventDefault();
         var action = e.target.getAttribute('data-action');
@@ -271,6 +427,7 @@
             }
         }
     };
+    //Assigning handler to all buttons in date picker
     var datePickerBtns = window.document.querySelectorAll('.date-picker .btn');
     for (var i = 0; i < datePickerBtns.length; i++) {
         Utils.addEvent(datePickerBtns[i], 'click', datePickerBtnHandler);

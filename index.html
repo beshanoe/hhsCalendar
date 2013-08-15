@@ -18,13 +18,13 @@
                             <a class="blue-btn" id="add-button" href="#">Добавить</a>
                         </li>
                         <li>
-                            <a class="blue-btn" id="refresh-btn" href="#">Обновить</a>
+                            <a class="blue-btn" id="refresh-button" href="#">Обновить</a>
                         </li>
                     </ul>
                 </div>
                 <div class="search">
                     <form>
-                        <input type="text" placeholder="Событие, дата или участник">
+                        <input id="search-input" type="text" placeholder="Событие, дата или участник">
                     </form>
                 </div>
             </div>
@@ -41,69 +41,63 @@
                 </ul>
             </div>
             <div class="calendar-wrap" id="calendar-block">
-                <table class="calendar">
-                    <tbody>
-                        <tr>
-                            <td class="has-records">
-                                <p class="day">Понедельник, 25</p>
-                                <div class="records">
-                                    <div class="record">
-                                        <p class="header">ДР кого-то</p>
-                                        <p class="members">Вася, Колян</p>
-                                        <p class="description">Узнать бы для начала у кого дырэ</p>
-                                    </div>
-                                    <div class="record">
-                                        <p class="header">В ломбард</p>
-                                        <p class="members"></p>
-                                        <p class="description">Заложить все имусчество</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Вторник, 26</td>
-                            <td>Среда, 27</td>
-                            <td>Четверг, 28</td>
-                            <td>Пятница, 1</td>
-                            <td>Суббота, 2</td>
-                            <td>Воскресенье, 3</td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- Table will be here -->
+            </div>
+        </div>
+    </div>
+    <div class="add-popup" id="add-popup">
+        <form>
+            <input type="text" placeholder="5 марта, 14:00, День рождения">
+            <div>
+                <button class="button">Создать</button>
+            </div>
+        </form>
+    </div>
+    <div class="search-popup" id="search-popup">
+        <div class="suggestions">
+            <div class="suggestion selected">
+                <p class="header">Покакаит</p>
+                <p class="date">5 марта</p>
+            </div>
+            <div class="suggestion">
+                <p class="header">Погнать на гонку</p>
+                <p class="date">1 апреля</p>
+            </div>
+            <div class="suggestion">
+                <p class="header">Деньрожде нииия</p>
+                <p class="date">19 мая</p>
+            </div>
+            <div class="suggestion">
+                <p class="header">Харамамбуру</p>
+                <p class="date">8 авгуса</p>
+            </div>
+            <div class="suggestion">
+                <p class="header">Снова в школу</p>
+                <p class="date">1 сентября</p>
+            </div>
+            <div class="suggestion">
+                <p class="header">Деньрожде нииия</p>
+                <p class="date">19 мая</p>
+            </div>
+            <div class="suggestion">
+                <p class="header">Харамамбуру</p>
+                <p class="date">8 авгуса</p>
+            </div>
+            <div class="suggestion">
+                <p class="header">Харамамбуру</p>
+                <p class="date">8 авгуса</p>
+            </div>
+            <div class="suggestion">
+                <p class="header">Снова в школу</p>
+                <p class="date">1 сентября</p>
+            </div>
+            <div class="suggestion">
+                <p class="header">Деньрожде нииия</p>
+                <p class="date">19 мая</p>
+            </div>
+            <div class="suggestion">
+                <p class="header">Харамамбуру</p>
+                <p class="date">8 авгуса</p>
             </div>
         </div>
     </div>
