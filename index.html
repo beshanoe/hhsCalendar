@@ -53,6 +53,42 @@
             </div>
         </form>
     </div>
+    <div class="edit-popup" id="edit-popup">
+        <form>
+            <div class="input-text title edit">
+                <div class="content">
+                    <b class='text'></b>
+                </div>
+                <div class="field">
+                    <input type="text">
+                </div>
+            </div>
+            <div class="input-text date edit">
+                <div class="content">
+                    <span class='text'></span>
+                </div>
+                <div class="field">
+                    <input type="text">
+                </div>
+            </div>
+            <div class="input-text members edit">
+                <div class="content">
+                    <p style="font-size: 11px; font-weight: bold;">Участники:</p>
+                    <p class='text'></p>
+                </div>
+                <div class="field">
+                    <input type="text">
+                </div>
+            </div>
+            <div>
+                <textarea class="description"></textarea>
+            </div>
+            <div class="buttons">
+                <button class="done">Готово</button>
+                <button class="delete">Удалить</button>
+            </div>
+        </form>
+    </div>
     <div class="search-popup" id="search-popup">
         <div class="suggestions">
             <div class="suggestion selected">
@@ -102,17 +138,17 @@
         </div>
     </div>
     <!-- Templates Begin -->
-    <script type="text/template" id="template-record">
+    <div class="text-template" id="template-record">
         <div class="record">
             <p class="header">{{title}}</p>
             <p class="members">{{members}}</p>
             <p class="description">{{description}}</p>
         </div>
-    </script>
-    <script type="text/template" id="template-td">
+    </div>
+    <div class="text-template" id="template-td">
         <p class="day">{{day}}</p>
         <div class="records">{{records}}</div>
-    </script>
+    </div>
     <!-- Templates End -->
     <script type="text/javascript" src="script.js"></script>
 </body>

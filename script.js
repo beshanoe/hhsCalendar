@@ -5,6 +5,8 @@
     Utils.dayNames = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
     Utils.monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
 
+    Utils.textProperty = (typeof window.document.body.innerText != 'undefined' ? 'innerText': 'textContent'); //Checking whether we have firefox or other browser
+
     Utils.extend = function(object1){ //jQuery.extend( target [, object1 ] [, objectN ] ) function analogue
         if (arguments.length > 1) {
             for (var i = 1; i < arguments.length; i++){
@@ -26,6 +28,13 @@
         return object1;
     };
 
+    Utils.forEach = function(ar, func) {
+        var length = ar.length;
+        for (var i = 0; i < length; i++){
+            func(ar[i], i);
+        }
+    };
+
     Utils.isLocalStorageSupported = function(){ //Checking browser support of localStorage
         try {
             return 'localStorage' in window && window['localStorage'] !== null;
@@ -34,33 +43,28 @@
         }
     };
 
-    Utils.createElementUsingHtml = function(html) { //Use to convert plain HTML to element object (html must have only one root element, otherwise only first will be converted)
-        var tmpEl = window.document.createElement('div');
-        console.log(tmpEl);
-        tmpEl.innerHTML = html;
-        //return tmpEl.firstChild;
-    };
-
     Utils.createDomElement = window.document.createElement.bind(window.document);
 
+    Utils.hasClass = function(el, className){
+        return el.className.match(new RegExp('(?:^|\\s)' + className + '(?!\\S)', 'g'));
+    };
+
     Utils.addClass = function(el){
-          if (arguments.length > 1) {
-              for (var i = 1; i < arguments.length; i++) {
-                  el.className += (' ' + arguments[i] + ' ');
-              }
-          }
+        if (arguments.length > 1) {
+            for (var i = 1; i < arguments.length; i++) {
+                if (!Utils.hasClass(el, arguments[i])) {
+                    el.className += ' ' + arguments[i];
+                }
+            }
+        }
     };
 
     Utils.removeClass = function(el){
         if (arguments.length > 1) {
             for (var i = 1; i < arguments.length; i++) {
-                el.className = el.className.replace(new RegExp(' ' + arguments[i] + ' ', 'g'), '');
+                el.className = el.className.replace(new RegExp('(?:^|\\s)' + arguments[i] + '(?!\\S)', 'g'), '');
             }
         }
-    };
-
-    Utils.hasClass = function(el, className){
-        return !!~el.className.indexOf(' ' + className + ' ');
     };
 
     Utils.addEvent = function(el, type, handler){
@@ -74,7 +78,7 @@
     Utils.renderTemplateWithObject = function(templateName, obj){ //Simplest template "engine" ever
         var templateEl = window.document.getElementById(templateName);
         if (templateEl) {
-            var templateHtml = templateEl.innerText.trim();
+            var templateHtml = templateEl.innerHTML.trim();
             for (key in obj) {
                 var regExp = new RegExp('{{' + key + '}}', 'g');
                 templateHtml = templateHtml.replace(regExp, obj[key]);
@@ -92,8 +96,8 @@
     }
 
     /*
-        BEGIN OF HeadHunterCalendar IMPLEMENTATION
-    */
+     HeadHunterCalendar IMPLEMENTATION
+     */
 
     var HeadHunterCalendar = function(options){
         if (this instanceof HeadHunterCalendar) {
@@ -247,12 +251,21 @@
         this.render();
     };
 
-    /*
-        END OF HeadHunterCalendar IMPLEMENTATION
-    */
+    HeadHunterCalendar.prototype.addCellEvent = function(type, handler){
+        for (var i = 0; i < this.tdElements.length; i++) {
+            var el = this.tdElements[i];
+            if (el) {
+                Utils.addEvent(el, type, (function(hhCalendar, td){
+                    return function(e){
+                        handler(hhCalendar, td, e);
+                    }
+                })(this, el));
+            }
+        }
+    };
 
     /*
-        POPUP Implementation
+     POPUP Implementation
      */
 
     var Popup = function(id, options){
@@ -277,6 +290,9 @@
             this.isShown = false;
 
             var div = Utils.createDomElement('div');
+            this.getDiv = function(){
+                return div;
+            };
             if (options.className) {
                 Utils.addClass(div, options.className);
             }
@@ -288,7 +304,7 @@
             if (options.closeButton) {
                 var closeBtn = Utils.createDomElement('div');
                 Utils.addClass(closeBtn, 'close-btn');
-                closeBtn.innerText = 'x';
+                closeBtn[Utils.textProperty] = 'x';
                 Utils.addEvent(closeBtn, 'click', (function(that){
                     return function(e){
                         that.hide();
@@ -305,9 +321,8 @@
             if (el) {
                 div.appendChild(el);
             }
-            this.div = div;
 
-            window.document.body.appendChild(this.div);
+            window.document.body.appendChild(div);
 
         }
     }
@@ -319,8 +334,8 @@
         }, options);
 
         if (options.arrow) {
-            Utils.removeClass(this.div, 'top', 'right', 'bottom', 'left');
-            Utils.addClass(this.div, options.arrow);
+            Utils.removeClass(this.getDiv(), 'top', 'right', 'bottom', 'left');
+            Utils.addClass(this.getDiv(), options.arrow);
         }
         if (options.el) {
 
@@ -331,31 +346,100 @@
                     elPoint.x = rect.left;
                     elPoint.y = rect.top + rect.height + 16;
                     break;
+                case 'bottom':
+                    break;
+                case 'left':
+                    elPoint.x = rect.right + 16;
+                    elPoint.y = rect.top;
+                    break;
             }
-            this.div.style.left = elPoint.x + 'px';
-            this.div.style.top = elPoint.y + 'px';
+            this.getDiv().style.left = elPoint.x + 'px';
+            this.getDiv().style.top = elPoint.y + 'px';
 
         }
 
         this.isShown = true;
-        if (!Utils.hasClass(this.div, 'show')){
-            Utils.addClass(this.div, 'show');
+        if (!Utils.hasClass(this.getDiv(), 'show')){
+            Utils.addClass(this.getDiv(), 'show');
         }
         if (this.onshow) {
-            this.onshow();
+            this.onshow(this);
         }
     };
 
     Popup.prototype.hide = function(){
         this.isShown = false;
-        Utils.removeClass(this.div, 'show');
+        Utils.removeClass(this.getDiv(), 'show');
         if (this.onhide) {
-            this.onhide();
+            this.onhide(this);
         }
     };
 
     /*
-        MAIN
+     Editable divs
+     */
+
+    var Editable = function(el, options){
+        if(this instanceof Editable){
+
+            var content = el.querySelector('.content');
+            var text = content.querySelector('.text');
+            var input = el.querySelector('.field input');
+
+            this.editMode = function(isEdit){
+                if (isEdit) {
+                    if (!Utils.hasClass(el, 'edit')) {
+                        Utils.addClass(el, 'edit');
+                    }
+                } else {
+                    Utils.removeClass(el, 'edit');
+                }
+            };
+
+            (function(that){
+                var value = '';
+                that.setValue = function(t){
+                    value = t;
+                    text[Utils.textProperty] = value;
+                    input.value = value;
+                    if (t != '') {
+                        that.editMode(false);
+                    }
+                    return that;
+                };
+                that.getValue = function(){
+                    return value;
+                };
+            })(this);
+
+            Utils.addEvent(content, 'click', (function(that){
+                return function(e){
+                    that.editMode(true);
+                    input.focus();
+                }
+            })(this));
+
+            var inputHandler = (function(that){
+                return function(e){
+                    that.setValue(e.target.value);
+                }
+            })(this);
+
+            Utils.addEvent(input, 'keyup', function(e){
+                if (e.keyCode == 13) {
+                    inputHandler(e);
+                }
+            });
+
+            Utils.addEvent(input, 'blur', function(e){
+                inputHandler(e);
+            });
+
+        }
+    };
+
+    /*
+     MAIN
      */
 
     //Creating almighty HeadHunterCalendar instance!
@@ -371,11 +455,50 @@
         calendarDiv.appendChild(headHunterCalendar.getTableElement());
     }
 
-
     //Creating popups
-    var addPopup = new Popup('add-popup');
+    //Edit cell popup
+    var editPopup = new Popup('edit-popup');
+    headHunterCalendar.addCellEvent('click', function(hhCalendar, td, e){
+        e.stopPropagation();
+        var prev = hhCalendar.getTableElement().querySelector('td.selected');
+        if (prev) {
+            Utils.removeClass(prev, 'selected');
+        }
+        Utils.addClass(td, 'selected');
+        editPopup.timeStamp = td.hhcDate.getTime();
+        editPopup.show({
+            el: td,
+            arrow: 'left'
+        })
+    });
+    //Creating editables
+    var titleEditable = new Editable(editPopup.getDiv().querySelector('.input-text.title'));
+    var dateEditable = new Editable(editPopup.getDiv().querySelector('.input-text.date'));
+    var membersEditable = new Editable(editPopup.getDiv().querySelector('.input-text.members'));
+    var descriptionEl = editPopup.getDiv().querySelector('.description');
 
-    //Handing toolbar buttons
+    editPopup.onshow = function(popup){
+        if (popup.timeStamp) {
+            var keyTs = '' + popup.timeStamp;
+            if (storage[keyTs]) {
+                var records = JSON.parse(storage[keyTs]);
+                if (records[0]) {
+                    titleEditable.setValue(records[0].title);
+                    dateEditable.setValue('5 september');
+                    membersEditable.setValue(records[0].members);
+                    descriptionEl[Utils.textProperty] = records[0].description;
+                }
+            } else {
+                titleEditable.setValue('').editMode(true);
+                dateEditable.setValue('').editMode(true);
+                membersEditable.setValue('').editMode(true);
+                descriptionEl[Utils.textProperty] = '';
+            }
+        }
+    };
+
+    //Add record popup and add button
+    var addPopup = new Popup('add-popup');
     var addBtn = window.document.getElementById('add-button');
     addPopup.onshow = function(){
         Utils.addClass(addBtn, 'pressed');
@@ -391,12 +514,14 @@
             arrow: 'top'
         });
     });
+    //Refresh button click handling
     var refreshBtn = window.document.getElementById('refresh-button');
     Utils.addEvent(refreshBtn, 'click', function(e){
         e.preventDefault();
         headHunterCalendar.refresh();
     });
 
+    //Search input and search popup
     var searchPopup = new Popup('search-popup', {
         closeButton: false
     });
