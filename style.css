@@ -143,11 +143,9 @@ table.calendar {
 }
 
 table.calendar td {
-    position: relative;
     border: solid 1px #DDD;
     height: 103px;
     width: 112px;
-    padding: 8px;
     cursor: default;
 }
 
@@ -155,11 +153,16 @@ table.calendar td.has-records {
     background-color: #C2E4FE;
 }
 
-table.calendar td .day {
+table.calendar .cell {
+    position: relative;
+    padding: 8px;
+}
+
+table.calendar .cell .day {
     margin-bottom: 6px;
 }
 
-table.calendar td .records {
+table.calendar .cell .records {
     height: 85px;
     overflow-y: hidden;
 }
@@ -172,7 +175,7 @@ table.calendar td .records {
     /*background-color: #86CAFD;*/
 /*}*/
 
-table.calendar td .record p {
+table.calendar .cell .record p {
     margin: 5px 0;
 }
 
@@ -188,7 +191,7 @@ table.calendar td.selected {
     background-color: #E5F1F9;
 }
 
-table.calendar td.selected:after {
+table.calendar td.selected .cell:after {
     display: block;
     content: '';
     position: absolute;
@@ -324,25 +327,25 @@ table.calendar td .record .header {
     padding: 5px;
 }
 
-.search-popup .suggestions {
+.search-popup .results {
     width: 205px;
     max-height: 400px;
     overflow-y: scroll;
 }
 
-.search-popup .suggestions .suggestion {
+.search-popup .results .result {
     padding: 8px;
 }
 
-.search-popup .suggestions .suggestion.selected{
+.search-popup .results .result.selected{
     background-color: #27A1FF;
 }
 
-.search-popup .suggestions .suggestion.selected p{
+.search-popup .results .result.selected p{
     color: #FFFFFF;
 }
 
-.search-popup .suggestions .suggestion:after {
+.search-popup .results .result:after {
     content: '';
     display: block;
     position: relative;
@@ -352,11 +355,11 @@ table.calendar td .record .header {
     border-top: 1px solid #CCC;
 }
 
-.search-popup .suggestions .suggestion p.header {
+.search-popup .results .result p.header {
     font-size: 12px;
 }
 
-.search-popup .suggestions .suggestion p.date {
+.search-popup .results .result p.date {
     font-size: 11px;
     margin-top: 8px;
 }

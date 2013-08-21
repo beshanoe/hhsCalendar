@@ -7,10 +7,11 @@
         HeadHunterCalendar,
         Popup,
         Editable,
-        headHunterCalendar;
+        Searcher;
 
     Utils.dayNames = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
     Utils.monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+    Utils.monthNamesGenitive = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
 
     Utils.textProperty = (window.document.body.innerText !== undefined ? 'innerText' : 'textContent'); //Checking whether we have firefox or other browser
 
@@ -60,7 +61,9 @@
         }
     };
 
-    Utils.createDomElement = window.document.createElement.bind(window.document);
+    Utils.createDomElement = function (tagName) {
+        return window.document.createElement(tagName);
+    };
 
     Utils.hasClass = function (el, className) {
         return el.className.match(new RegExp('(?:^|\\s)' + className + '(?!\\S)', 'g'));
@@ -72,7 +75,7 @@
                 if (!Utils.hasClass(el, value)) {
                     el.className += ' ' + value;
                 }
-            });
+            }, 1);
         }
     };
 
@@ -80,7 +83,7 @@
         if (arguments.length > 1) {
             Utils.forEach(arguments, function (i, value) {
                 el.className = el.className.replace(new RegExp('(?:^|\\s)' + value + '(?!\\S)', 'g'), '');
-            });
+            }, 1);
         }
     };
 
@@ -110,6 +113,30 @@
             return templateHtml;
         }
         return '';
+    };
+
+    Utils.parseDate = function (dateStr, defaultYear) {
+        var pieces = dateStr.split(dateStr.indexOf('.') === -1 ? /[ ,]+/ : '.'),
+            day,
+            month,
+            year = defaultYear,
+            resultDate;
+
+        day = parseInt(pieces[0], 10);
+        if (pieces[1]) {
+            month = parseInt(pieces[1], 10);
+            if (isNaN(month)) {
+                month = Utils.monthNamesGenitive.indexOf(pieces[1].toLowerCase());
+                if (month < 0) {
+                    month = undefined;
+                }
+            }
+        }
+        if (pieces[2]) {
+            year = parseInt(pieces[2], 10);
+        }
+        resultDate = new Date(year, month, day);
+        return resultDate;
     };
 
     //Defining storage, use localStorage if it is available, otherwise use temporal plain object
@@ -150,9 +177,7 @@
 
             if (options.monthYearIndicator) {
                 monthYearIndicator = options.monthYearIndicator;
-                if (monthYearIndicator instanceof HTMLElement) {
-                    this.monthYearIndicator = monthYearIndicator;
-                }
+                this.monthYearIndicator = monthYearIndicator;
             }
             this.storage = {};
             if (options.storage) {
@@ -188,7 +213,7 @@
         }
     };
 
-    HeadHunterCalendar.prototype.render = function (data) {
+    HeadHunterCalendar.prototype.render = function (data, td) {
 
         var date,
             day,
@@ -202,10 +227,7 @@
             this.monthYearIndicator.innerHTML = this.getMonthYearPorusski(Utils.monthNames);
         }
 
-        date = new Date(0, 0, 0);
-        date.setDate(1);
-        date.setMonth(this.date.getMonth());
-        date.setFullYear(this.date.getFullYear());
+        date = new Date(this.date.getFullYear(), this.date.getMonth(), 1);
         day = date.getDay();
         day = ((day === 0) ? 6 : day - 1);
         date.setDate(-day);
@@ -328,6 +350,7 @@
                         }
                     };
                 }(this)));
+                this.isAnywhereClose = true;
             }
 
             this.isShown = false;
@@ -364,6 +387,7 @@
             if (el) {
                 div.appendChild(el);
             }
+            this.id = id;
 
             window.document.body.appendChild(div);
 
@@ -383,17 +407,18 @@
         if (options.el) {
 
             var rect = options.el.getBoundingClientRect(),
-                elPoint = {x: 0, y: 0};
+                elPoint = {x: 0, y: 0},
+                rectTop = rect.top + window.document.body.scrollTop;
             switch (options.arrow) {
             case 'top':
                 elPoint.x = rect.left;
-                elPoint.y = rect.top + rect.height + 16;
+                elPoint.y = rectTop + rect.height + 16;
                 break;
             case 'bottom':
                 break;
             case 'left':
                 elPoint.x = rect.right + 16;
-                elPoint.y = rect.top;
+                elPoint.y = rectTop - 20;
                 break;
             }
             this.getDiv().style.left = elPoint.x + 'px';
@@ -408,6 +433,11 @@
         if (this.onshow) {
             this.onshow(this);
         }
+        if (Popup.lastOpened && Popup.lastOpened !== this && Popup.lastOpened.isAnywhereClose) {
+            Popup.lastOpened.hide();
+        }
+        Popup.lastOpened = this;
+
     };
 
     Popup.prototype.hide = function () {
@@ -483,6 +513,36 @@
     };
 
     /*
+        Searcher implementation
+     */
+
+    Searcher = function (storage, options) {
+
+        this.getStorage = function () {
+            return storage;
+        };
+        this.setStorage = function (strg) {
+            storage = strg;
+        };
+
+        options = Utils.extend({
+            templateId: 'template-result'
+        }, options);
+        this.getTemplateId = function () {
+            return options.templateId;
+        };
+
+    };
+
+    Searcher.prototype.search = function () {
+        var searchThread;
+        searchThread = function () {
+
+        };
+        setTimeout(searchThread, 0);
+    };
+
+    /*
      MAIN
      */
     (function () {
@@ -499,6 +559,7 @@
             addPopup,
             addBtn,
             refreshBtn,
+            createBtn,
             searchPopup,
             searchInput,
             datePickerBtnHandler,
@@ -523,16 +584,19 @@
         editPopup = new Popup('edit-popup');
         headHunterCalendar.addCellEvent('click', function (hhCalendar, td, e) {
             e.stopPropagation();
-            var prev = hhCalendar.getTableElement().querySelector('td.selected');
-            if (prev) {
-                Utils.removeClass(prev, 'selected');
+            if (!(Utils.hasClass(td, 'selected') && editPopup.isShown)) {
+                var prev = hhCalendar.getTableElement().querySelector('td.selected');
+                if (prev) {
+                    Utils.removeClass(prev, 'selected');
+                }
+                Utils.addClass(td, 'selected');
+                editPopup.selectedTd = td;
+                editPopup.timeStamp = td.hhcDate.getTime();
+                editPopup.show({
+                    el: td,
+                    arrow: 'left'
+                });
             }
-            Utils.addClass(td, 'selected');
-            editPopup.timeStamp = td.hhcDate.getTime();
-            editPopup.show({
-                el: td,
-                arrow: 'left'
-            });
         });
         //Creating editables
         titleEditable = new Editable(editPopup.getDiv().querySelector('.input-text.title'));
@@ -545,28 +609,68 @@
 
         editPopup.onshow = function (popup) {
             if (popup.timeStamp) {
-                var keyTs = popup.timeStamp.toString(),
+                var popupDate = new Date(popup.timeStamp),
+                    keyTs = popup.timeStamp.toString(),
                     records;
                 if (storage[keyTs]) {
                     records = JSON.parse(storage[keyTs]);
                     if (records[0]) {
                         titleEditable.setValue(records[0].title);
-                        dateEditable.setValue('5 september');
                         membersEditable.setValue(records[0].members);
                         descriptionEl.value = records[0].description;
                     }
                 } else {
                     titleEditable.setValue('').editMode(true);
-                    dateEditable.setValue('').editMode(true);
                     membersEditable.setValue('').editMode(true);
                     descriptionEl.value = '';
                 }
+                dateEditable.setValue(popupDate.getDate() + ' ' + Utils.monthNamesGenitive[popupDate.getMonth()]);
+            }
+        };
+        editPopup.onhide = function (popup) {
+            if (popup.timeStamp) {
+                delete popup.timeStamp;
             }
         };
 
         Utils.addEvent(editDoneBtn, 'click', function () {
             if (editPopup.timeStamp) {
+                var ts = editPopup.timeStamp,
+                    values = {
+                        date: dateEditable.getValue(),
+                        title: titleEditable.getValue(),
+                        members: membersEditable.getValue(),
+                        desc: descriptionEl.value
+                    },
+                    parsedDate = Utils.parseDate(values.date, headHunterCalendar.getYear());
 
+                if (!isNaN(parsedDate.getTime()) && ts !== parsedDate.getTime()) {
+                    delete storage[ts];
+                    ts = parsedDate.getTime();
+                    headHunterCalendar.date = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), 1);
+                }
+                if (values.desc === '' && values.title === '' && values.members === '') {
+                    if (storage[ts]) {
+                        delete storage[ts];
+                    }
+                } else {
+                    storage[ts] = JSON.stringify([
+                        {
+                            title: values.title,
+                            members: values.members,
+                            description: values.desc
+                        }
+                    ]);
+                }
+                headHunterCalendar.render();
+                editPopup.hide();
+            }
+        });
+        Utils.addEvent(editDeleteBtn, 'click', function () {
+            if (editPopup.timeStamp) {
+                delete storage[editPopup.timeStamp];
+                editPopup.hide();
+                headHunterCalendar.render();
             }
         });
 
@@ -587,6 +691,40 @@
                 arrow: 'top'
             });
         });
+        createBtn = addPopup.getDiv().querySelector('.create-btn');
+        Utils.addEvent(createBtn, 'click', function (e) {
+            var input,
+                commaPos,
+                dateStr,
+                titleStr,
+                parsedDate,
+                ts;
+            e.preventDefault();
+            input = addPopup.getDiv().querySelector('input');
+            commaPos = input.value.indexOf(',');
+            if (!(commaPos < 0)) {
+                dateStr = input.value.substr(0, commaPos);
+                titleStr = input.value.substr(commaPos + 1).trim();
+                parsedDate = Utils.parseDate(dateStr, headHunterCalendar.getYear());
+                if (!isNaN(parsedDate.getTime()) && titleStr.length > 0) {
+                    ts = parsedDate.getTime();
+                    headHunterCalendar.date = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), 1);
+                    storage[ts] = JSON.stringify([
+                        {
+                            title: titleStr,
+                            members: '',
+                            description: ''
+                        }
+                    ]);
+                    headHunterCalendar.render();
+                    addPopup.hide();
+                } else {
+                    alert('Введите событие в правильном формате: дата, заголовок');
+                }
+            } else {
+                alert('Введите событие в правильном формате: дата, заголовок');
+            }
+        });
         //Refresh button click handling
         refreshBtn = window.document.getElementById('refresh-button');
         Utils.addEvent(refreshBtn, 'click', function (e) {
@@ -599,13 +737,27 @@
             closeButton: false
         });
         searchInput = window.document.getElementById('search-input');
-        Utils.addEvent(searchInput, 'click', function (e) {
-            e.stopPropagation();
-            searchPopup.show({
-                el: e.target,
-                arrow: 'top'
-            });
+        Utils.addEvent(searchInput, 'keydown', function (e) {
+            var value = e.target.value;
+            if (e.keyCode === 8) {
+                value = value.substr(0, value.length - 1);
+            } else if (e.keyCode !== 13 && e.keyCode !== 9) {
+                value += String.fromCharCode(e.keyCode);
+            }
+            if (value === '') {
+                if (searchPopup.isShown) {
+                    searchPopup.hide();
+                }
+            } else if (!searchPopup.isShown) {
+                searchPopup.show({
+                    el: e.target,
+                    arrow: 'top'
+                });
+            }
         });
+        searchPopup.onshow = function (popup) {
+            var val = searchInput.value;
+        };
 
         //Date picker buttons clicks handler
         datePickerBtnHandler = function (e) {

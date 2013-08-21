@@ -47,20 +47,20 @@
     </div>
     <div class="add-popup" id="add-popup">
         <form>
-            <input type="text" placeholder="5 марта, 14:00, День рождения">
+            <input type="text" class="" placeholder="5 марта, 14:00, День рождения">
             <div>
-                <button class="button">Создать</button>
+                <button class="button create-btn">Создать</button>
             </div>
         </form>
     </div>
     <div class="edit-popup" id="edit-popup">
-        <form>
+        <form onsubmit="event.preventDefault();">
             <div class="input-text title edit">
                 <div class="content">
                     <b class='text'></b>
                 </div>
                 <div class="field">
-                    <input type="text">
+                    <input type="text" placeholder="Название">
                 </div>
             </div>
             <div class="input-text date edit">
@@ -68,7 +68,7 @@
                     <span class='text'></span>
                 </div>
                 <div class="field">
-                    <input type="text">
+                    <input type="text" placeholder="Дата, например '3 сентября'">
                 </div>
             </div>
             <div class="input-text members edit">
@@ -77,11 +77,11 @@
                     <p class='text'></p>
                 </div>
                 <div class="field">
-                    <input type="text">
+                    <input type="text" placeholder="Имена участников">
                 </div>
             </div>
             <div>
-                <textarea class="description"></textarea>
+                <textarea class="description" placeholder="Описание"></textarea>
             </div>
             <div class="buttons">
                 <button class="done">Готово</button>
@@ -90,48 +90,48 @@
         </form>
     </div>
     <div class="search-popup" id="search-popup">
-        <div class="suggestions">
-            <div class="suggestion selected">
+        <div class="results">
+            <div class="result selected">
                 <p class="header">Покакаит</p>
                 <p class="date">5 марта</p>
             </div>
-            <div class="suggestion">
+            <div class="result">
                 <p class="header">Погнать на гонку</p>
                 <p class="date">1 апреля</p>
             </div>
-            <div class="suggestion">
+            <div class="result">
                 <p class="header">Деньрожде нииия</p>
                 <p class="date">19 мая</p>
             </div>
-            <div class="suggestion">
+            <div class="result">
                 <p class="header">Харамамбуру</p>
                 <p class="date">8 авгуса</p>
             </div>
-            <div class="suggestion">
+            <div class="result">
                 <p class="header">Снова в школу</p>
                 <p class="date">1 сентября</p>
             </div>
-            <div class="suggestion">
+            <div class="result">
                 <p class="header">Деньрожде нииия</p>
                 <p class="date">19 мая</p>
             </div>
-            <div class="suggestion">
+            <div class="result">
                 <p class="header">Харамамбуру</p>
                 <p class="date">8 авгуса</p>
             </div>
-            <div class="suggestion">
+            <div class="result">
                 <p class="header">Харамамбуру</p>
                 <p class="date">8 авгуса</p>
             </div>
-            <div class="suggestion">
+            <div class="result">
                 <p class="header">Снова в школу</p>
                 <p class="date">1 сентября</p>
             </div>
-            <div class="suggestion">
+            <div class="result">
                 <p class="header">Деньрожде нииия</p>
                 <p class="date">19 мая</p>
             </div>
-            <div class="suggestion">
+            <div class="result">
                 <p class="header">Харамамбуру</p>
                 <p class="date">8 авгуса</p>
             </div>
@@ -139,15 +139,17 @@
     </div>
     <!-- Templates Begin -->
     <div class="text-template" id="template-record">
-        <div class="record">
-            <p class="header">{{title}}</p>
-            <p class="members">{{members}}</p>
-            <p class="description">{{description}}</p>
-        </div>
+            <div class="record">
+                <p class="header">{{title}}</p>
+                <p class="members">{{members}}</p>
+                <p class="description">{{description}}</p>
+            </div>
     </div>
     <div class="text-template" id="template-td">
-        <p class="day">{{day}}</p>
-        <div class="records">{{records}}</div>
+        <div class="cell">
+            <p class="day">{{day}}</p>
+            <div class="records">{{records}}</div>
+        </div>
     </div>
     <!-- Templates End -->
     <script type="text/javascript" src="script.js"></script>
