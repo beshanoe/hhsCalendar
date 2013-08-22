@@ -23,7 +23,7 @@
                     </ul>
                 </div>
                 <div class="search">
-                    <form>
+                    <form onsubmit="return false;">
                         <input id="search-input" type="text" placeholder="Событие, дата или участник">
                     </form>
                 </div>
@@ -54,7 +54,7 @@
         </form>
     </div>
     <div class="edit-popup" id="edit-popup">
-        <form onsubmit="event.preventDefault();">
+        <form>
             <div class="input-text title edit">
                 <div class="content">
                     <b class='text'></b>
@@ -84,58 +84,13 @@
                 <textarea class="description" placeholder="Описание"></textarea>
             </div>
             <div class="buttons">
-                <button class="done">Готово</button>
-                <button class="delete">Удалить</button>
+                <button class="done" type="submit">Готово</button>
+                <button class="delete" type="reset">Удалить</button>
             </div>
         </form>
     </div>
     <div class="search-popup" id="search-popup">
-        <div class="results">
-            <div class="result selected">
-                <p class="header">Покакаит</p>
-                <p class="date">5 марта</p>
-            </div>
-            <div class="result">
-                <p class="header">Погнать на гонку</p>
-                <p class="date">1 апреля</p>
-            </div>
-            <div class="result">
-                <p class="header">Деньрожде нииия</p>
-                <p class="date">19 мая</p>
-            </div>
-            <div class="result">
-                <p class="header">Харамамбуру</p>
-                <p class="date">8 авгуса</p>
-            </div>
-            <div class="result">
-                <p class="header">Снова в школу</p>
-                <p class="date">1 сентября</p>
-            </div>
-            <div class="result">
-                <p class="header">Деньрожде нииия</p>
-                <p class="date">19 мая</p>
-            </div>
-            <div class="result">
-                <p class="header">Харамамбуру</p>
-                <p class="date">8 авгуса</p>
-            </div>
-            <div class="result">
-                <p class="header">Харамамбуру</p>
-                <p class="date">8 авгуса</p>
-            </div>
-            <div class="result">
-                <p class="header">Снова в школу</p>
-                <p class="date">1 сентября</p>
-            </div>
-            <div class="result">
-                <p class="header">Деньрожде нииия</p>
-                <p class="date">19 мая</p>
-            </div>
-            <div class="result">
-                <p class="header">Харамамбуру</p>
-                <p class="date">8 авгуса</p>
-            </div>
-        </div>
+        <div class="results"></div>
     </div>
     <!-- Templates Begin -->
     <div class="text-template" id="template-record">
@@ -149,6 +104,12 @@
         <div class="cell">
             <p class="day">{{day}}</p>
             <div class="records">{{records}}</div>
+        </div>
+    </div>
+    <div class="text-template" id="template-result">
+        <div class="result">
+            <p class="header">{{title}}</p>
+            <p class="date">{{date}}</p>
         </div>
     </div>
     <!-- Templates End -->

@@ -7,7 +7,8 @@
         HeadHunterCalendar,
         Popup,
         Editable,
-        Searcher;
+        Searcher,
+        Scroller;
 
     Utils.dayNames = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
     Utils.monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
@@ -55,7 +56,7 @@
 
     Utils.isLocalStorageSupported = function () { //Checking browser support of localStorage
         try {
-            return window.hasOwnProperty('localStorage') && window.localStorage !== null;
+            return window.hasOwnProperty('localStorage') || window.localStorage !== undefined;
         } catch (e) {
             return false;
         }
@@ -92,6 +93,23 @@
             el.addEventListener(type, handler, false);
         } else if (el.attachEvent) {
             el.attachEvent('on' + type, handler);
+        }
+    };
+
+    Utils.addMouseWheelEvent = function (el, handler) {
+        if (el.addEventListener) {
+            if ('onwheel' in document) {
+                // IE9+, FF17+
+                el.addEventListener("wheel", handler, false);
+            } else if ('onmousewheel' in document) {
+                // устаревший вариант события
+                el.addEventListener("mousewheel", handler, false);
+            } else {
+                // 3.5 <= Firefox < 17, более старое событие DOMMouseScroll пропустим
+                el.addEventListener("MozMousePixelScroll", handler, false);
+            }
+        } else { // IE<9
+            el.attachEvent("onmousewheel", handler);
         }
     };
 
@@ -499,13 +517,16 @@
                 };
             }(this));
 
-            Utils.addEvent(input, 'keyup', function (e) {
+            Utils.addEvent(input, 'keydown', function (e) {
                 if (e.keyCode === 13) {
+                    e.preventDefault();
                     inputHandler(e);
                 }
             });
-
             Utils.addEvent(input, 'blur', function (e) {
+                inputHandler(e);
+            });
+            Utils.addEvent(input, 'change', function (e) {
                 inputHandler(e);
             });
 
@@ -534,12 +555,94 @@
 
     };
 
-    Searcher.prototype.search = function () {
-        var searchThread;
-        searchThread = function () {
-
-        };
+    Searcher.prototype.search = function (str, callback) {
+        var searchThread,
+            that = this;
+        this.lastSearched = str;
+        searchThread = (function (that, str) {
+            return function () {
+                var storage = that.getStorage(),
+                    key,
+                    record,
+                    date,
+                    dateStr,
+                    results = [];
+                for (key in storage) {
+                    if (str !== that.lastSearched) {
+                        return;
+                    }
+                    if (storage.hasOwnProperty(key)) {
+                        record = JSON.parse(storage[key])[0];
+                        record.ts = parseInt(key, 10);
+                        if (record.title.toLowerCase().indexOf(str.toLowerCase()) >= 0) {
+                            results.push(record);
+                        } else if (record.members.toLowerCase().indexOf(str.toLowerCase()) >= 0) {
+                            results.push(record);
+                        } else {
+                            date = new Date(record.ts);
+                            dateStr = date.getDate() + ' ' + Utils.monthNamesGenitive[date.getMonth()];
+                            if (dateStr.indexOf(str.toLowerCase()) >= 0) {
+                                results.push(record);
+                            }
+                        }
+                    }
+                }
+                if (str === that.lastSearched) {
+                    callback(results);
+                }
+            };
+        }(this, str));
         setTimeout(searchThread, 0);
+    };
+
+    /*
+        Custom scroller implementation
+     */
+
+    Scroller = function (area, options) {
+
+        var scrollbar,
+            that = this,
+            calculateScrollbar;
+        this.isScrollable = false;
+        this.getArea = function () {
+            return area;
+        };
+        scrollbar = Utils.createDomElement('div');
+        Utils.addClass(scrollbar, 'scrollbar');
+        area.appendChild(scrollbar);
+        this.getScrollbar = function () {
+            return scrollbar;
+        };
+        calculateScrollbar = function (area, scrollbar) {
+            var scrollbarHeight = Math.round(area.clientHeight / area.scrollHeight * 96),
+                scrollbarTop = 2 + Math.round(area.scrollTop / area.scrollHeight * 96);
+            scrollbar.style.height = scrollbarHeight + '%';
+            scrollbar.style.top = scrollbarTop + '%';
+        };
+        this.calculateScrollbar = calculateScrollbar;
+        Utils.addMouseWheelEvent(area, function (e) {
+            if (that.isScrollable) {
+                e.preventDefault();
+                area.scrollTop += e.wheelDelta;
+                calculateScrollbar(area, scrollbar);
+            }
+        });
+
+    };
+
+    Scroller.prototype.refresh = function () {
+        var area = this.getArea();
+        if (area.scrollHeight > area.clientHeight) {
+            if (!Utils.hasClass(area, 'scrollable')) {
+                Utils.addClass(area, 'scrollable');
+            }
+            this.isScrollable = true;
+            this.calculateScrollbar(area, this.getScrollbar());
+        } else {
+            Utils.removeClass(area, 'scrollable');
+            this.isScrollable = false;
+        }
     };
 
     /*
@@ -554,14 +657,15 @@
             dateEditable,
             membersEditable,
             descriptionEl,
-            editDoneBtn,
-            editDeleteBtn,
+            editForm,
             addPopup,
             addBtn,
             refreshBtn,
             createBtn,
+            searcher,
             searchPopup,
             searchInput,
+            scroller,
             datePickerBtnHandler,
             datePickerBtns;
 
@@ -604,9 +708,6 @@
         membersEditable = new Editable(editPopup.getDiv().querySelector('.input-text.members'));
         descriptionEl = editPopup.getDiv().querySelector('.description');
 
-        editDoneBtn = editPopup.getDiv().querySelector('.buttons .done');
-        editDeleteBtn = editPopup.getDiv().querySelector('.buttons .delete');
-
         editPopup.onshow = function (popup) {
             if (popup.timeStamp) {
                 var popupDate = new Date(popup.timeStamp),
@@ -633,7 +734,9 @@
             }
         };
 
-        Utils.addEvent(editDoneBtn, 'click', function () {
+        editForm = editPopup.getDiv().querySelector('form');
+        Utils.addEvent(editForm, 'submit', function (e) {
+            e.preventDefault();
             if (editPopup.timeStamp) {
                 var ts = editPopup.timeStamp,
                     values = {
@@ -665,8 +768,9 @@
                 headHunterCalendar.render();
                 editPopup.hide();
             }
+            return false;
         });
-        Utils.addEvent(editDeleteBtn, 'click', function () {
+        Utils.addEvent(editForm, 'reset', function () {
             if (editPopup.timeStamp) {
                 delete storage[editPopup.timeStamp];
                 editPopup.hide();
@@ -733,25 +837,67 @@
         });
 
         //Search input and search popup
+        scroller = new Scroller(window.document.getElementById('search-popup'));
+        searcher = new Searcher(storage);
         searchPopup = new Popup('search-popup', {
             closeButton: false
         });
         searchInput = window.document.getElementById('search-input');
-        Utils.addEvent(searchInput, 'keydown', function (e) {
+        Utils.addEvent(searchInput, 'keyup', function (e) {
             var value = e.target.value;
-            if (e.keyCode === 8) {
-                value = value.substr(0, value.length - 1);
-            } else if (e.keyCode !== 13 && e.keyCode !== 9) {
-                value += String.fromCharCode(e.keyCode);
-            }
             if (value === '') {
                 if (searchPopup.isShown) {
                     searchPopup.hide();
                 }
-            } else if (!searchPopup.isShown) {
-                searchPopup.show({
-                    el: e.target,
-                    arrow: 'top'
+            } else {
+                if (!searchPopup.isShown) {
+                    searchPopup.show({
+                        el: e.target,
+                        arrow: 'top'
+                    });
+                }
+                searcher.search(value, function (results) {  //Callback function invoked when results are gotten
+                    var i,
+                        resultsLength = results.length,
+                        record,
+                        title,
+                        date,
+                        dateStr,
+                        renderedEl,
+                        resultsDiv,
+                        divider,
+                        resultClickHandler;
+                    resultsDiv = searchPopup.getDiv().querySelector('.results');
+                    if (results.length) {
+                        resultsDiv.innerHTML = '';
+                    } else {
+                        resultsDiv.innerHTML = '<p class="empty">Совпадений не найдено</p>';
+                    }
+                    resultClickHandler = function (record) {
+                        return function (e) {
+                            var date = new Date(record.ts);
+                            headHunterCalendar.date = new Date(date.getFullYear(), date.getMonth(), 1);
+                            headHunterCalendar.render();
+                            searchPopup.hide();
+                        };
+                    };
+                    for (i = 0; i < resultsLength; i += 1) {
+                        record = results[i];
+                        date = new Date(record.ts);
+                        dateStr = date.getDate() + ' ' + Utils.monthNamesGenitive[date.getMonth()];
+                        renderedEl = Utils.createDomElement('div');
+                        renderedEl.innerHTML = Utils.renderTemplateWithObject('template-result', {
+                            title: record.title,
+                            date: dateStr
+                        });
+                        renderedEl = renderedEl.firstChild;
+                        Utils.addEvent(renderedEl, 'click', resultClickHandler(record));
+                        resultsDiv.appendChild(renderedEl);
+                        divider = Utils.createDomElement('div');
+                        Utils.addClass(divider, 'divider');
+                        resultsDiv.appendChild(divider);
+                    }
+                    scroller.refresh(); //Refreshing custom scroller state after content change
                 });
             }
         });

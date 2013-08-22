@@ -324,39 +324,85 @@ table.calendar td .record .header {
 }
 
 .search-popup {
-    padding: 5px;
+    padding: 0 5px;
+    max-height: 400px;
+    overflow: hidden;
+}
+
+.search-popup.scrollable {
+    padding-right: 21px;
+}
+
+.search-popup.scrollable .scrollbar {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.6);
+    width: 7px;
+    height: 5%;
+    right: 7px;
+    top: 2%;
+    border-radius: 4px;
 }
 
 .search-popup .results {
-    width: 205px;
-    max-height: 400px;
-    overflow-y: scroll;
+    position: relative;
+}
+
+.search-popup .results:after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40px;
+    height: 100%;
+    z-index: 1;
+    background-image: url("results-bg.png");
+    background-repeat: repeat-y;
+}
+
+.search-popup .results .empty{
+    text-align: center;
+    padding: 5px 8px;
+    z-index: 3;
+    position: relative;
+}
+
+.search-popup .results .divider {
+    position: relative;
+    z-index: 3;
+    width: 94%;
+    height: 0;
+    left: 3%;
+    bottom: 0px;
+    border-top: 1px solid #EEE;
 }
 
 .search-popup .results .result {
-    padding: 8px;
-}
-
-.search-popup .results .result.selected{
-    background-color: #27A1FF;
-}
-
-.search-popup .results .result.selected p{
-    color: #FFFFFF;
-}
-
-.search-popup .results .result:after {
-    content: '';
-    display: block;
+    width: 190px;
+    padding: 5px 8px;
     position: relative;
-    width: 90%;
-    height: 0;
-    bottom: -5px;
-    border-top: 1px solid #CCC;
+    margin: 3px 0;
+    cursor: default;
+    overflow: hidden;
+}
+
+.search-popup .results .result:hover{
+    background-color: #27A1FF;
+    z-index: 3;
+}
+
+.search-popup .results .result:hover:AFTER{
+
+}
+
+.search-popup .results .result:hover p{
+    color: #FFFFFF;
 }
 
 .search-popup .results .result p.header {
     font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
 }
 
 .search-popup .results .result p.date {
