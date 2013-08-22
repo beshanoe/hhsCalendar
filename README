@@ -1,1 +1,2 @@
-This file was created by JetBrains WebStorm 6.0.1 for binding GitHub repository
+Выполненное задание для школы разработчиков HeadHunter. 
+Календарь поддерживает добавление, перенос записей, поиск по записям. Где возможно, используется LocalStorage. Работает в IE9, Chrome, Firefox, Opera.
