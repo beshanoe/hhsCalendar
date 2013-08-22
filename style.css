@@ -164,16 +164,9 @@ table.calendar .cell .day {
 
 table.calendar .cell .records {
     height: 85px;
-    overflow-y: hidden;
+    overflow: hidden;
+    width: 112px;
 }
-
-/*table.calendar td .record:hover {*/
-    /*background-color: #EEE;*/
-/*}*/
-
-/*table.calendar td.has-records .record:hover {*/
-    /*background-color: #86CAFD;*/
-/*}*/
 
 table.calendar .cell .record p {
     margin: 5px 0;
